@@ -39,12 +39,12 @@
       in
         pkgs.lib.mkForce ''
           # Set up applications.
-          echo "[I] Setting up /Applications" >&2
+          echo "setting up /Applications" >&2
           rm -rf /Applications/Nix\ Apps
           mkdir -p /Applications/Nix\ Apps
           find ${env}/Applications -maxdepth 1 -type l -exec readlink '{}' + | while read src; do
             app_name=$(basename "$src")
-            echo "[I] Linking $app_name" >&2
+            echo "aliasing $app_name" >&2
             ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
           done
         '';
