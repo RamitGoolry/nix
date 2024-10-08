@@ -9,12 +9,41 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs }:
   let
-    configuration = { pkgs, ... }: {
-      # List packages installed in system profile. To search by name, run:
-      # $ nix-env -qaP | grep wget
-      environment.systemPackages =
-        [ pkgs.vim
-        ];
+    configuration = { pkgs, config, ... }: {
+      
+      # Installed packages
+      environment.systemPackages = [ 
+        pkgs.gimp
+        pkgs.discord
+
+        pkgs.neovim
+        pkgs.mkalias
+        pkgs.tmux
+        pkgs.htop
+        pkgs.jq
+        pkgs.ffmpeg
+
+        pkgs.go
+      ];
+
+      system.activationScripts.applications.text = let
+        env = pkgs.buildEnv {
+          name = "system-applications";
+          paths = config.environment.systemPackaged;
+          pathsToLink = "/Applications";
+        }
+      in
+        pkgs.lib.mkForce ''
+          # Set up applications.
+          echo "[I] Setting up /Applications" >&2
+          rm -rf /Applications/Nix\ Apps
+          mkdir -p /Applications/Nix\ Apps
+          find ${env}/Applications -maxdepth 1 -type l -exec readlink '{}' + | while read src; do
+            app_name=$(basename "$src")
+            echo "[I] Linking $app_name" >&2
+            ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
+          done
+        '';
 
       # Auto upgrade nix package and the daemon service.
       services.nix-daemon.enable = true;
@@ -35,17 +64,17 @@
       system.stateVersion = 5;
 
       # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "x86_64-darwin";
+      nixpkgs.hostPlatform = "aarch64-darwin";
     };
   in
   {
     # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#simple
-    darwinConfigurations."simple" = nix-darwin.lib.darwinSystem {
+    # $ darwin-rebuild build --flake .#personal
+    darwinConfigurations."personal" = nix-darwin.lib.darwinSystem {
       modules = [ configuration ];
     };
 
     # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations."simple".pkgs;
+    darwinPackages = self.darwinConfigurations."personal".pkgs;
   };
 }
