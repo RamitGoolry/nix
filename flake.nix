@@ -14,6 +14,7 @@
 
       # Installed packages
       environment.systemPackages = [
+        pkgs.alacritty
         pkgs.discord
         pkgs.gimp
         pkgs.google-chrome
