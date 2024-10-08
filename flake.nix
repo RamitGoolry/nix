@@ -118,7 +118,9 @@
           ];
 
           masApps = {
-
+            "Petrify" = 1451177988;
+            "Patterns" = 429449079;
+            "OneNote" = 784801555;
           };
 
           onActivation.cleanup = "zap";
