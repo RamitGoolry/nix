@@ -26,8 +26,15 @@
         pkgs.docker-compose
         pkgs.gh
         pkgs.bettercap
+        pkgs.git
+        pkgs.cloudflared
+        pkgs.antigen
+        pkgs.nmap
+        pkgs.wget
+        pkgs.doxygen
 
         pkgs.go
+        pkgs.gleam
       ];
 
       system.activationScripts.applications.text = let
