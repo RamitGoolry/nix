@@ -20,6 +20,12 @@
         pkgs.htop
         pkgs.jq
         pkgs.ffmpeg
+        pkgs.fzf
+        pkgs.btop
+        pkgs.docker
+        pkgs.docker-compose
+        pkgs.gh
+        pkgs.bettercap
 
         pkgs.go
       ];
