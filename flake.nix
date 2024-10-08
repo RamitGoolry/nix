@@ -21,7 +21,6 @@
         pkgs.google-chrome
         pkgs.iterm2
         pkgs.obsidian
-        # pkgs.firefox
         pkgs.vscode
         pkgs.rectangle
         pkgs.zoom-us
@@ -99,6 +98,30 @@
         pkgs.terraform
         pkgs.ruby
       ];
+
+      homebrew = {
+          enable = true;
+          brews = [
+            "mas"
+          ];
+
+          casks = [
+            "anydesk"
+            "insomnia"
+            "notion"
+            "firefox"
+            "numi"
+            "balenaetcher"
+            "tor-browser"
+            "whatsapp"
+          ];
+
+          masApps = {
+
+          };
+
+          onActivation.cleanup = "zap";
+      };
 
       fonts.packages = [];
 
