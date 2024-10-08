@@ -28,7 +28,6 @@
         pkgs.bettercap
         pkgs.git
         pkgs.cloudflared
-        pkgs.antigen
         pkgs.nmap
         pkgs.wget
         pkgs.doxygen
