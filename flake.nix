@@ -5,9 +5,10 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
   let
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
@@ -28,6 +29,7 @@
         pkgs.stats
         # pkgs.tor-browser
 
+        pkgs.antigen
         pkgs.coreutils
         pkgs.neovim
         pkgs.mkalias
@@ -82,6 +84,8 @@
         pkgs.gnutls
         pkgs.gdk-pixbuf
         pkgs.unbound
+        pkgs.fira-code
+        pkgs.fira-code-nerdfont
 
         pkgs.glib    # TODO: Needed?
         pkgs.librist # TODO: Needed?
@@ -95,6 +99,8 @@
         pkgs.terraform
         pkgs.ruby
       ];
+
+      fonts.packages = [];
 
       system.activationScripts.applications.text = let
         env = pkgs.buildEnv {
@@ -141,7 +147,16 @@
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#personal
     darwinConfigurations."personal" = nix-darwin.lib.darwinSystem {
-      modules = [ configuration ];
+      modules = [
+        configuration
+        nix-homebrew.darwinModules.nix-homebrew {
+          nix-homebrew = {
+            enable = true;
+            enableRosetta = true;
+            user = "ramit";
+          };
+        }
+      ];
     };
 
     # Expose the package set, including overlays, for convenience.
