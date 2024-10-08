@@ -32,8 +32,16 @@
         pkgs.wget
         pkgs.doxygen
 
+        pkgs.awscli
+        pkgs.graphviz
+        pkgs.gd
+        pkgs.guile
+        # pkgs.cairo
+        # pkgs.cjson
+
         pkgs.go
         pkgs.gleam
+        pkgs.nodejs_18
       ];
 
       system.activationScripts.applications.text = let
