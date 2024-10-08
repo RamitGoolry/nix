@@ -102,6 +102,7 @@
       homebrew = {
           enable = true;
           brews = [
+            "antigen"
             "mas"
           ];
 
