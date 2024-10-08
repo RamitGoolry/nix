@@ -18,6 +18,14 @@
         pkgs.gimp
         pkgs.google-chrome
         pkgs.iterm2
+        pkgs.obsidian
+        # pkgs.firefox
+        pkgs.vscode
+        pkgs.rectangle
+        pkgs.zoom-us
+        pkgs.slack
+        pkgs.stats
+        # pkgs.tor-browser
 
         pkgs.coreutils
         pkgs.neovim
@@ -59,6 +67,7 @@
         pkgs.turso-cli
         pkgs.openssl_3_3
         pkgs.pgadmin4
+        pkgs.tshark
 
         pkgs.awscli
         pkgs.graphviz
