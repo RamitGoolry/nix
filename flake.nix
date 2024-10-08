@@ -10,10 +10,16 @@
   outputs = inputs@{ self, nix-darwin, nixpkgs }:
   let
     configuration = { pkgs, config, ... }: {
-      # Installed packages
-      environment.systemPackages = [ 
-        pkgs.gimp
+      nixpkgs.config.allowUnfree = true;
 
+      # Installed packages
+      environment.systemPackages = [
+        pkgs.discord
+        pkgs.gimp
+        pkgs.google-chrome
+        pkgs.iterm2
+
+        pkgs.coreutils
         pkgs.neovim
         pkgs.mkalias
         pkgs.tmux
@@ -31,17 +37,53 @@
         pkgs.nmap
         pkgs.wget
         pkgs.doxygen
+        pkgs.httpie
+        pkgs.kubernetes-helm
+        pkgs.helm-ls
+        pkgs.kubectl
+        pkgs.taskwarrior3
+        pkgs.taskwarrior-tui
+        pkgs.lazygit
+        pkgs.ntfy-sh
+        pkgs.neofetch
+        pkgs.ollama
+        pkgs.llvm
+        pkgs.unixtools.watch
+        pkgs.lua-language-server
+        pkgs.speedtest-cli
+        pkgs.terraform-ls
+        pkgs.tree
+        pkgs.tree-sitter
+        pkgs.mysql-shell
+        pkgs.redis
+        pkgs.turso-cli
+        pkgs.openssl_3_3
+        pkgs.pgadmin4
 
         pkgs.awscli
         pkgs.graphviz
         pkgs.gd
         pkgs.guile
-        # pkgs.cairo
-        # pkgs.cjson
+        pkgs.netpbm
+        pkgs.pango
+        pkgs.tesseract
+        pkgs.gobject-introspection
+        pkgs.harfbuzz
+        pkgs.gnutls
+        pkgs.gdk-pixbuf
+        pkgs.unbound
+
+        pkgs.glib    # TODO: Needed?
+        pkgs.librist # TODO: Needed?
+        pkgs.libidn2 # TODO: Needed?
 
         pkgs.go
         pkgs.gleam
-        pkgs.nodejs_18
+        pkgs.nodejs_18 # TODO: Prefer n over nodejs
+        pkgs.lua
+        pkgs.python312
+        pkgs.terraform
+        pkgs.ruby
       ];
 
       system.activationScripts.applications.text = let
