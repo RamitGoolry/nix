@@ -10,11 +10,9 @@
   outputs = inputs@{ self, nix-darwin, nixpkgs }:
   let
     configuration = { pkgs, config, ... }: {
-      
       # Installed packages
       environment.systemPackages = [ 
         pkgs.gimp
-        pkgs.discord
 
         pkgs.neovim
         pkgs.mkalias
@@ -29,7 +27,7 @@
       system.activationScripts.applications.text = let
         env = pkgs.buildEnv {
           name = "system-applications";
-          paths = config.environment.systemPackaged;
+          paths = config.environment.systemPackages;
           pathsToLink = "/Applications";
         };
       in
