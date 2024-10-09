@@ -10,6 +10,54 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
   let
+    system = "aarch64-darwin";
+    pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+    };
+
+    buildDmgApp = { name, version, url, sha256, appName }:
+      pkgs.stdenv.mkDerivation {
+        pname = name;
+        inherit version;
+
+        src = pkgs.fetchurl {
+          inherit url sha256;
+        };
+
+        buildPhase = ''
+          mkdir -p mnt
+          hdiutil attach -nobrowse -readonly -mountpoint mnt $src
+          appName="${appName}.app"
+          cp -R "mnt/${appName}" "${appName}"
+
+          hdiutil detach mnt
+        '';
+
+        installPhase = ''
+          mkdir -p $out/Applications
+          cp -R "${appName}" $out/Applications/
+        '';
+
+        meta = with pkgs.lib; {
+          description = "Package ${name} version ${version} from DMG";
+          homepage = "unavailable";
+          license = licenses.unfree;
+          platforms = platforms.darwin;
+        };
+      };
+
+    dmgApps = [
+      {
+        name = "Immersed";
+        version = "1.0.0";
+        url = "https://static.immersed.com/dl/Immersed.dmg";
+        sha256 = "fe0fea8f912ec16abcfa995202b0facf29ee598e35c1805a32b34afe754154f1";
+        appName = "Immersed";
+      }
+    ];
+    dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
+
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
 
@@ -91,7 +139,8 @@
         pkgs.terraform
         pkgs.ruby
         pkgs.cargo
-      ];
+        pkgs.bun
+      ] ++ dmgAppPackages;
 
       homebrew = {
           enable = true;
