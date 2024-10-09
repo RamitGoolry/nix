@@ -92,6 +92,7 @@
         pkgs.python312
         pkgs.terraform
         pkgs.ruby
+        pkgs.cargo
       ];
 
       homebrew = {
