@@ -26,7 +26,6 @@
         pkgs.zoom-us
         pkgs.slack
         pkgs.stats
-        # pkgs.tor-browser
 
         pkgs.antigen
         pkgs.coreutils
@@ -123,6 +122,7 @@
             "OneNote" = 784801555;
             "Notability" = 360593530;
             "Goodnotes" = 1444383602;
+            "Amphetamine" = 937984704;
           };
 
           onActivation.cleanup = "zap";
@@ -151,25 +151,17 @@
           done
         '';
 
-      # Auto upgrade nix package and the daemon service.
       services.nix-daemon.enable = true;
       # nix.package = pkgs.nix;
 
-      # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";
 
-      # Create /etc/zshrc that loads the nix-darwin environment.
       programs.zsh.enable = true;  # default shell on catalina
       # programs.fish.enable = true;
 
-      # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;
-
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
       system.stateVersion = 5;
 
-      # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
     };
   in
@@ -189,7 +181,6 @@
       ];
     };
 
-    # Expose the package set, including overlays, for convenience.
     darwinPackages = self.darwinConfigurations."personal".pkgs;
   };
 }
