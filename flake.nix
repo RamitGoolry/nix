@@ -85,10 +85,6 @@
         pkgs.fira-code
         pkgs.fira-code-nerdfont
 
-        pkgs.glib    # TODO: Needed?
-        pkgs.librist # TODO: Needed?
-        pkgs.libidn2 # TODO: Needed?
-
         pkgs.go
         pkgs.gleam
         pkgs.nodejs_18 # TODO: Prefer n over nodejs
