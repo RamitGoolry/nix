@@ -121,6 +121,8 @@
             "Petrify" = 1451177988;
             "Patterns" = 429449079;
             "OneNote" = 784801555;
+            "Notability" = 360593530;
+            "Goodnotes" = 1444383602;
           };
 
           onActivation.cleanup = "zap";
