@@ -98,6 +98,11 @@
           brews = [
             "antigen"
             "mas"
+            "codecrafters-io/tap/codecrafters"
+          ];
+
+          taps = [
+            "codecrafters-io/tap"
           ];
 
           casks = [
