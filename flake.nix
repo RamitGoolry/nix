@@ -16,7 +16,7 @@
         config.allowUnfree = true;
     };
 
-    buildDmgApp = { name, version, url, sha256, appName }:
+    buildDmgApp = { name, version, url, sha256, appName ? null }:
       pkgs.stdenv.mkDerivation {
         pname = name;
         inherit version;
@@ -25,25 +25,36 @@
           inherit url sha256;
         };
 
+        # Skip the default unpackPhase
+        dontUnpack = true;
+
+        buildInputs = [ pkgs.hdiutil pkgs.coreutils pkgs.findutils ];
+
         buildPhase = ''
           mkdir -p mnt
-          hdiutil attach -nobrowse -readonly -mountpoint mnt $src
-          appName="${appName}.app"
+          hdiutil attach -nobrowse -readonly -mountpoint mnt "$src"
+
+          if [ -z "${appName}" ]; then
+            appName=$(find mnt -maxdepth 1 -name "*.app" | head -n1 | xargs basename)
+          else
+            appName="${appName}.app"
+          fi
+
           cp -R "mnt/${appName}" "${appName}"
 
           hdiutil detach mnt
         '';
 
         installPhase = ''
-          mkdir -p $out/Applications
-          cp -R "${appName}" $out/Applications/
+          mkdir -p "$out/Applications"
+          cp -R "${appName}" "$out/Applications/"
         '';
 
-        meta = with pkgs.lib; {
+        meta = {
           description = "Package ${name} version ${version} from DMG";
           homepage = "unavailable";
-          license = licenses.unfree;
-          platforms = platforms.darwin;
+          license = pkgs.lib.licenses.unfree;
+          platforms = pkgs.lib.platforms.darwin;
         };
       };
 
