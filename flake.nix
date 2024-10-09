@@ -82,8 +82,6 @@
         pkgs.gnutls
         pkgs.gdk-pixbuf
         pkgs.unbound
-        pkgs.fira-code
-        pkgs.fira-code-nerdfont
 
         pkgs.go
         pkgs.gleam
@@ -111,6 +109,8 @@
             "balenaetcher"
             "tor-browser"
             "whatsapp"
+            "font-fira-code"
+            "font-fira-code-nerd-font"
           ];
 
           masApps = {
