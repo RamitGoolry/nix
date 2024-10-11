@@ -67,7 +67,7 @@
         appName = "Immersed";
       }
     ];
-    dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
+    # dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
 
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
@@ -128,6 +128,8 @@
         pkgs.openssl_3_3
         pkgs.pgadmin4
         pkgs.tshark
+        pkgs.eza
+        pkgs.ripgrep
 
         pkgs.awscli
         pkgs.graphviz
@@ -151,7 +153,8 @@
         pkgs.ruby
         pkgs.cargo
         pkgs.bun
-      ] ++ dmgAppPackages;
+      # ] ++ dmgAppPackages;
+      ];
 
       homebrew = {
           enable = true;
