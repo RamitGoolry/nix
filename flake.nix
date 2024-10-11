@@ -16,7 +16,9 @@
         config.allowUnfree = true;
     };
 
-    buildDmgApp = { name, version, url, sha256, appName ? null }:
+    # NOTE: We are using the system `hdiutil` and `codesign` tools to mount the DMG.
+    # If we can, we should use the `nixpkgs` version of these tools.
+    buildDmgApp = { name, version, url, sha256, appName }:
       pkgs.stdenv.mkDerivation {
         pname = name;
         inherit version;
@@ -26,28 +28,41 @@
         };
 
         # Skip the default unpackPhase
-        dontUnpack = true;
+        nativeBuildInputs = [ pkgs.coreutils pkgs.findutils ];
 
-        buildInputs = [ pkgs.hdiutil pkgs.coreutils pkgs.findutils ];
+        unpackPhase = ''
+          runHook preUnpack
 
-        buildPhase = ''
-          mkdir -p mnt
-          hdiutil attach -nobrowse -readonly -mountpoint mnt "$src"
+          TMPMOUNT=$(mktemp -d)
+          echo "Mounting $src to $TMPMOUNT"
+          /usr/bin/hdiutil attach -nobrowse -readonly -mountpoint "$TMPMOUNT" "$src"
 
-          if [ -z "${appName}" ]; then
-            appName=$(find mnt -maxdepth 1 -name "*.app" | head -n1 | xargs basename)
-          else
-            appName="${appName}.app"
-          fi
-
-          cp -R "mnt/${appName}" "${appName}"
-
-          hdiutil detach mnt
+          runHook postUnpack
         '';
 
         installPhase = ''
-          mkdir -p "$out/Applications"
-          cp -R "${appName}" "$out/Applications/"
+          runHook preInstall
+
+          if [ -e "$TMPMOUNT/${appName}" ]; then
+            mkdir -p "$out/Applications"
+            cp -pR "$TMPMOUNT/${appName}" "$out/Applications/"
+          else
+            echo "ERROR: ${appName} not found in DMG"
+            ls -R "$TMPMOUNT"
+            exit 1
+          fi
+
+          runHook postInstall
+        '';
+
+        postInstall = ''
+          /usr/bin/hdiutil detach "$TMPMOUNT"
+          rm -rf "$TMPMOUNT"
+        '';
+
+         postFixup = ''
+            app="$out/Applications/${appName}"
+            /usr/bin/codesign --sign - --force --deep "$app"
         '';
 
         meta = {
@@ -61,13 +76,13 @@
     dmgApps = [
       {
         name = "Immersed";
-        version = "1.0.0";
+        version = "21.4.0";
         url = "https://static.immersed.com/dl/Immersed.dmg";
-        sha256 = "fe0fea8f912ec16abcfa995202b0facf29ee598e35c1805a32b34afe754154f1";
-        appName = "Immersed";
+        sha256 = "sha256-/g/qj5EuwWq8+plSArD6zynuWY41wYBaMrNK/nVBVPE=";
+        appName = "Immersed.app";
       }
     ];
-    # dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
+    dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
 
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
@@ -153,8 +168,7 @@
         pkgs.ruby
         pkgs.cargo
         pkgs.bun
-      # ] ++ dmgAppPackages;
-      ];
+      ] ++ dmgAppPackages;
 
       homebrew = {
           enable = true;
