@@ -174,6 +174,7 @@
         pkgs.zoom-us
         pkgs.slack
         pkgs.stats
+        pkgs.arc-browser
 
         pkgs.antigen
         pkgs.coreutils
@@ -247,14 +248,14 @@
 
       homebrew = {
           enable = true;
+          taps = [
+            "codecrafters-io/tap"
+          ];
+
           brews = [
             "antigen"
             "mas"
             "codecrafters-io/tap/codecrafters"
-          ];
-
-          taps = [
-            "codecrafters-io/tap"
           ];
 
           casks = [
