@@ -27,7 +27,6 @@
           inherit url sha256;
         };
 
-        # Skip the default unpackPhase
         nativeBuildInputs = [ pkgs.coreutils pkgs.findutils ];
 
         unpackPhase = ''
@@ -81,8 +80,83 @@
         sha256 = "sha256-/g/qj5EuwWq8+plSArD6zynuWY41wYBaMrNK/nVBVPE=";
         appName = "Immersed.app";
       }
+      {
+        name = "Raspberry Pi Imager";
+        version = "1.9.0";
+        url = "https://github.com/raspberrypi/rpi-imager/releases/download/v1.9.0/Raspberry.Pi.Imager-1.9.0.dmg";
+        sha256 = "sha256-w5eCOGTyLqtpTyFgqekt68G0OaK+znRFRcqNr9o56q4=";
+        appName = "Raspberry Pi Imager.app";
+      }
     ];
     dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
+
+
+    # NOTE: We are using the system `pkgutil` tool to mount the PKG.
+    # If we can, we should use the `nixpkgs` version of this tool.
+    buildPkgApp = { name, version, url, sha256, appName }:
+      pkgs.stdenv.mkDerivation {
+        pname = name;
+        inherit version;
+        
+        src = pkgs.fetchurl {
+          inherit url sha256;
+        };
+
+        unpackPhase = ''
+          runHook preUnpack
+
+          # Generate a temporary mount point path
+          TMPMOUNT="/tmp/pkg-mount-$(date +%s)"
+          echo "Mounting $src to $TMPMOUNT"
+          /usr/sbin/pkgutil --expand "$src" "$TMPMOUNT"
+
+          runHook postUnpack
+        '';
+
+        installPhase = ''
+          runHook preInstall
+
+          if [ -e "$TMPMOUNT/${appName}" ]; then
+            mkdir -p "$out/Applications"
+            cp -pR "$TMPMOUNT/${appName}" "$out/Applications/"
+          else
+            echo "ERROR: ${appName} not found in PKG"
+            ls -R "$TMPMOUNT"
+            exit 1
+          fi
+
+          runHook postInstall
+        '';
+
+        postInstall = ''
+          /usr/sbin/pkgutil --forget "$TMPMOUNT"
+          rm -rf "$TMPMOUNT"
+        '';
+
+         postFixup = ''
+            app="$out/Applications/${appName}"
+            /usr/bin/codesign --sign - --force --deep "$app"
+        '';
+
+        meta = {
+          description = "Package ${name} version ${version} from PKG";
+          homepage = "unavailable";
+          license = pkgs.lib.licenses.unfree;
+          platforms = pkgs.lib.platforms.darwin;
+        };
+      };
+
+    pkgApps = [
+      {
+        name = "Elgato Stream Deck";
+        version = "6.7.3.21005";
+        url = "https://edge.elgato.com/egc/macos/sd/Stream_Deck_6.7.3.21005.pkg";
+        sha256 = "sha256-3xMXa1vQbDc9v41Znlmefo0W2n4yZHN/tHuy8DMgFhA=";
+        appName = "Elgato Stream Deck.app";
+      }
+    ];
+
+    pkgAppPackages = map (appAttrs: buildPkgApp appAttrs) pkgApps;
 
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
@@ -169,6 +243,7 @@
         pkgs.cargo
         pkgs.bun
       ] ++ dmgAppPackages;
+        # ++ pkgAppPackages;
 
       homebrew = {
           enable = true;
