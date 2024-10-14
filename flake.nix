@@ -6,13 +6,15 @@
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, rust-overlay }:
   let
     system = "aarch64-darwin";
+    overlays = [ (import rust-overlay) ];
     pkgs = import nixpkgs {
-        inherit system;
+        inherit system overlays;
         config.allowUnfree = true;
     };
 
@@ -158,6 +160,10 @@
 
     pkgAppPackages = map (appAttrs: buildPkgApp appAttrs) pkgApps;
 
+    rustPackage = pkgs.rust-bin.stable.latest.default.override {
+      extensions = [ "rust-src" "rust-analyzer" ];
+    };
+
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
 
@@ -176,7 +182,6 @@
         pkgs.stats
         pkgs.arc-browser
 
-        pkgs.antigen
         pkgs.coreutils
         pkgs.neovim
         pkgs.mkalias
@@ -220,6 +225,8 @@
         pkgs.tshark
         pkgs.eza
         pkgs.ripgrep
+        pkgs.bacon
+        pkgs.graphite-cli
 
         pkgs.awscli
         pkgs.graphviz
@@ -241,10 +248,14 @@
         pkgs.python312
         pkgs.terraform
         pkgs.ruby
-        pkgs.cargo
         pkgs.bun
+        rustPackage
       ] ++ dmgAppPackages;
         # ++ pkgAppPackages;
+
+      environment.variables = {
+        RUST_SRC_PATH =  "${rustPackage}/lib/rustlib/src/rust/library";
+      };
 
       homebrew = {
           enable = true;
