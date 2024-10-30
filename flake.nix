@@ -249,6 +249,7 @@
         pkgs.terraform
         pkgs.ruby
         pkgs.bun
+        pkgs.erlang
         rustPackage
       ] ++ dmgAppPackages;
         # ++ pkgAppPackages;
@@ -267,6 +268,8 @@
             "antigen"
             "mas"
             "codecrafters-io/tap/codecrafters"
+            "exercism"
+            "cocoapods"
           ];
 
           casks = [
