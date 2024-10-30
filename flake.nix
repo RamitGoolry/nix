@@ -194,7 +194,7 @@
         pkgs.docker
         pkgs.docker-compose
         pkgs.gh
-        pkgs.bettercap
+        # pkgs.bettercap
         pkgs.git
         pkgs.cloudflared
         pkgs.nmap
