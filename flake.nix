@@ -92,7 +92,6 @@
     ];
     dmgAppPackages = map (appAttrs: buildDmgApp appAttrs) dmgApps;
 
-
     # NOTE: We are using the system `pkgutil` tool to mount the PKG.
     # If we can, we should use the `nixpkgs` version of this tool.
     buildPkgApp = { name, version, url, sha256, appName }:
@@ -163,6 +162,25 @@
     rustPackage = pkgs.rust-bin.stable.latest.default.override {
       extensions = [ "rust-src" "rust-analyzer" ];
     };
+
+    
+    eas-cli = pkgs.writeShellScriptBin "eas" ''
+      # Set up npm global directory in user's home
+      export NPM_CONFIG_PREFIX="$HOME/.npm-packages"
+      export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+      
+      # Create the directory if it doesn't exist
+      mkdir -p "$NPM_CONFIG_PREFIX"
+      
+      # Check if eas-cli is installed
+      if ! command -v "$NPM_CONFIG_PREFIX/bin/eas" &> /dev/null; then
+        echo "Installing eas-cli globally in $NPM_CONFIG_PREFIX..."
+        ${pkgs.nodejs_18}/bin/npm install -g eas-cli@12.6.2
+      fi
+      
+      # Execute the command
+      exec "$NPM_CONFIG_PREFIX/bin/eas" "$@"
+    '';
 
     configuration = { pkgs, config, ... }: {
       nixpkgs.config.allowUnfree = true;
@@ -251,6 +269,7 @@
         pkgs.bun
         pkgs.erlang
         rustPackage
+        eas-cli
       ] ++ dmgAppPackages;
         # ++ pkgAppPackages;
 
