@@ -289,6 +289,7 @@
             "codecrafters-io/tap/codecrafters"
             "exercism"
             "cocoapods"
+            "watchman"
           ];
 
           casks = [
