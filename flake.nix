@@ -290,6 +290,7 @@
             "exercism"
             "cocoapods"
             "watchman"
+            "pocketbase"
           ];
 
           casks = [
@@ -333,7 +334,7 @@
           echo "setting up /Applications" >&2
           rm -rf /Applications/Nix\ Apps
           mkdir -p /Applications/Nix\ Apps
-          find ${env}/Applications -maxdepth 1 -type l -exec readlink '{}' + | while read src; do
+          find ${env}/Applications -maxdepth 1 -type l -exec readlink '{}' + | while read -r src; do
             app_name=$(basename "$src")
             echo "aliasing $app_name" >&2
             ${pkgs.mkalias}/bin/mkalias "$src" "/Applications/Nix Apps/$app_name"
