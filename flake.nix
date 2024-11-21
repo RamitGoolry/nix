@@ -291,6 +291,7 @@
             "cocoapods"
             "watchman"
             "pocketbase"
+            "postgresql"
           ];
 
           casks = [
